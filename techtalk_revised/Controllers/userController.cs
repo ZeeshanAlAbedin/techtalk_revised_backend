@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,13 +17,26 @@ namespace techtalk_revised.Controllers
         //Db entity
         private techtalkEntities db = new techtalkEntities();
 
-        //GET all users
         [HttpGet]
-
-        public IHttpActionResult getUsers()
+        public JArray getUsers()
         {
-            return Ok(db.users);
+            List<user> categories = db.users.ToList();
+            JArray array = new JArray();
+
+            foreach (var category in categories)
+            {
+                JObject obj = new JObject();
+                obj["userid"] = category.userID;
+                obj["uname"] = category.username;
+                obj["designation"] = category.designation;
+                obj["cgicode"] = category.cgicode;
+                array.Add(obj);
+            }
+
+            return array;
+
         }
+
 
         //GET users via ID
         [HttpGet]

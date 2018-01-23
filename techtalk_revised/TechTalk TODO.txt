@@ -1,0 +1,101 @@
+To-Do
+
+Update Events
+Delete/Cancel Events
+User Login - Connection, Validation
+Admin Login - FrontEnd UI, Connection, Vaidation
+
+Optional Features
+Highlighted Events
+User Interests
+
+To-Do
+Ppt upload
+Validation
+Highlighted Events
+Interested Users
+Single Page Application
+Test Cases
+
+Today todo Highlighted Events 
+
+Database:
+X-------X
+
+User, Techtalk(event), TechTalk_User
+
+User:
+ID, Name, Password, isAdmin, CGI code, Designation
+
+TechTalk
+ID, Ename, Descriptio, scheduledOn, PPT
+
+TechTalk_user,
+ID, User ID, TechTalk ID
+
+TechTalk_presenter,
+ID, User ID, Techtalk ID
+
+
+admin can create user
+
+
+moments JS
+
+API LIST DOWN:
+ 
+//GET
+-- users
+-- techtalks?
+-- techtalks/id
+-- users/id
+-- techtalk/id/attendees
+
+//POST
+-- admin/techtalk
+-- user/user
+
+
+Never make API calls in controllers
+All Api calls in a service folder
+Auth should me in another file
+
+1 controller != 1 Service
+
+Index.html
+utils -- Using samething again and again
+Date.Prototype
+Add Prototype
+
+
+
+
+
+user dashboard --> Upcoming events, Past Events --> All clickable to show data
+admin Dashboard --> CRUD user, CRUD events, Date-time-venue
+
+user login -- RSVP -- PPT upload -- How Many people attended
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

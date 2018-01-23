@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
@@ -17,6 +18,7 @@ namespace techtalk_revised.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class eventController : ApiController
     {
+        private techtalkEntities db = new techtalkEntities();
         [HttpGet]
         public JArray GetAllEvents()
         {
@@ -31,6 +33,8 @@ namespace techtalk_revised.Controllers
                 obj["edate"] = category.scheduledOn;
                 obj["edes"] = category.edescription;
                 obj["eurl"] = category.presentationURL;
+                //var name = (from s in db.users where category.userID == s.userID select s.username).FirstOrDefault();
+                //obj["username"] =JObject.Parse(name);
                 obj["userid"] = category.userID;
                 array.Add(obj);
             }
@@ -39,15 +43,87 @@ namespace techtalk_revised.Controllers
 
         }
 
-        private techtalkEntities db = new techtalkEntities();
+
+        [HttpGet]
+        public JArray GetAllEventsbyID(int id)
+        {
+            tevent eventfound = db.tevents.Find(id);
+            if(eventfound == null)
+            {
+                BadRequest();
+            }
+
+            var selectedAll = from s in db.tevents where s.eventID == id select s;   
+            List <tevent> eventList = selectedAll.ToList();
+            JArray array = new JArray();
+            foreach(var elist in eventList)
+            {
+                JObject obj = new JObject();
+                obj["eventid"] = elist.eventID;
+                obj["ename"] = elist.ename;
+                obj["edate"] = elist.scheduledOn;
+                obj["edes"] = elist.edescription;
+                obj["uid"] = elist.userID;
+                array.Add(obj);
+            }
+
+            return array;
+
+        }
+
+        //Update
+        [HttpPut]
+        public IHttpActionResult updateEvent(int id, tevent ev)
+        {
+
+            var entity = db.tevents.FirstOrDefault(e => e.eventID == id);
+            entity.ename = ev.ename;
+            entity.edescription = ev.edescription;
+            entity.scheduledOn = ev.scheduledOn;
+            entity.userID = entity.userID;
+            db.SaveChanges();
+            return Ok();
+               
+        }
+
+        //Image upload
+        public HttpResponseMessage Post()
+        {
+            //var entity = db.tevents.FirstOrDefault(e => e.eventID == id);
+            HttpResponseMessage result = null;
+            var httpRequest = HttpContext.Current.Request;
+            if (httpRequest.Files.Count > 0)
+            {
+                var docfiles = new List<string>();
+                foreach (string file in httpRequest.Files)
+                {
+                    var postedFile = httpRequest.Files[file];
+                    var filePath = HttpContext.Current.Server.MapPath("~/" + postedFile.FileName);
+                    postedFile.SaveAs(filePath);
+
+                    docfiles.Add(filePath);
+                }
+                result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+            }
+            else
+            {
+                result = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            return result;
+        }
+
+
+
+
+
+
+
+
+
+
 
         /*public IQueryable<tevent> GetAllEvent()
         {
-
-         
-        
-        
-
 
             var allEvents = from s in db.tevents orderby s.scheduledOn descending select s;
             return allEvents;
