@@ -16,6 +16,26 @@ namespace techtalk_revised.Controllers
     {
         //Db entity
         private techtalkEntities db = new techtalkEntities();
+        [HttpPost]
+        public IQueryable<user> LoginCheck(user user)
+        {
+            user foundUser = db.users.Where(a => a.username.Equals(user.username)&& user.password.Equals(user.password)).FirstOrDefault();
+            if (foundUser == null)
+                return null;
+            else
+            {
+
+                if (foundUser.isAdmin == true)
+                    return db.users.Where(a => a.isAdmin.Equals(true));
+                else
+                    if(foundUser.isAdmin == false)
+                    return db.users.Where(a => a.isAdmin.Equals(false));
+                else
+                    return null;
+            }
+           
+        }
+
 
         [HttpGet]
         public JArray getUsers()

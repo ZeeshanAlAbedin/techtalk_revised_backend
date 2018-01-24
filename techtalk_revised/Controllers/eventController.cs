@@ -16,9 +16,11 @@ using techtalk_revised.Models;
 namespace techtalk_revised.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
+
     public class eventController : ApiController
     {
         private techtalkEntities db = new techtalkEntities();
+
         [HttpGet]
         public JArray GetAllEvents()
         {
@@ -42,9 +44,36 @@ namespace techtalk_revised.Controllers
             return array;
 
         }
-
-
         [HttpGet]
+        public JArray GetAllEventsbyID(int id)
+        {
+            tevent eventfound = db.tevents.Find(id);
+            if (eventfound == null)
+            {
+                BadRequest();
+            }
+
+            var selectedAll = from s in db.tevents where s.eventID == id select s;
+            List<tevent> eventList = selectedAll.ToList();
+            JArray array = new JArray();
+            foreach (var elist in eventList)
+            {
+                JObject obj = new JObject();
+                obj["eventid"] = elist.eventID;
+                obj["ename"] = elist.ename;
+                obj["edate"] = elist.scheduledOn;
+                obj["edes"] = elist.edescription;
+                obj["uid"] = elist.userID;
+                array.Add(obj);
+            }
+
+            return array;
+
+        }
+
+
+
+        /*[HttpGet]
         public JArray GetAllEventsbyID(int id)
         {
             tevent eventfound = db.tevents.Find(id);
@@ -69,7 +98,7 @@ namespace techtalk_revised.Controllers
 
             return array;
 
-        }
+        }*/
 
         //Update
         [HttpPut]
@@ -174,6 +203,35 @@ namespace techtalk_revised.Controllers
 
             return CreatedAtRoute("DefaultApi", new { id = eventTable.eventID }, eventTable);
         }
+        public IHttpActionResult PostEventUser(tevent_users eventUser)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            db.tevent_users.Add(eventUser);
+
+
+            try
+            {
+
+                db.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                if (EventTableExists(eventUser.eventID))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtRoute("DefaultApi", new { id = eventUser.eventID }, eventUser);
+        }
+
         // PUT: api/EventTables/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutEventTable(int id, tevent eventTable)
@@ -227,5 +285,6 @@ namespace techtalk_revised.Controllers
         {
             return db.tevents.Count(e => e.eventID == id) > 0;
         }
+        
     }
 }
